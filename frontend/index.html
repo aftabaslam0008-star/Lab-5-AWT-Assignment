@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise Multi-Tenant Security Gateway</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <div class="header-title">
+        <h1>Enterprise Security Gateway</h1>
+        <p class="subtitle">Hybrid Authentication &bull; JWT &bull; Refresh Rotation &bull; RBAC &bull; Multi-Tenant Isolation</p>
+      </div>
+      <div id="connectionBadge" class="badge badge-success">API: Ready (Port 5000)</div>
+    </header>
+
+    <!-- Quick Role Switcher -->
+    <section class="card">
+      <div class="card-header">
+        <h2>1. Quick Login with Demo Roles</h2>
+        <span class="card-hint">Pre-seeded accounts with specific RBAC permissions</span>
+      </div>
+      <div class="role-grid">
+        <button type="button" class="btn btn-outline" onclick="quickLogin('employee')">
+          <strong>Employee</strong>
+          <small>employee@example.com (Access: Profile)</small>
+        </button>
+        <button type="button" class="btn btn-outline" onclick="quickLogin('manager')">
+          <strong>Manager</strong>
+          <small>manager@example.com (Access: Profile + Payroll)</small>
+        </button>
+        <button type="button" class="btn btn-outline" onclick="quickLogin('superadmin')">
+          <strong>SuperAdmin</strong>
+          <small>superadmin@example.com (Full Access + User Deletion)</small>
+        </button>
+      </div>
+    </section>
+
+    <!-- Active Session Card -->
+    <section class="card" id="sessionCard">
+      <div class="card-header">
+        <h2>Current Session</h2>
+        <span id="sessionStatus" class="badge badge-neutral">Not Logged In</span>
+      </div>
+      <div id="sessionDetails" class="session-info" style="display:none;">
+        <div class="info-row">
+          <span><strong>User:</strong> <span id="sessUser">-</span></span>
+          <span><strong>Role:</strong> <span id="sessRole" class="role-tag">-</span></span>
+          <span><strong>Tenant ID:</strong> <span id="sessTenant">-</span></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="two-col">
+      <!-- Custom Login & Register -->
+      <div class="col">
+        <section class="card">
+          <div class="tab-header">
+            <button id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">Login</button>
+            <button id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">Register New</button>
+          </div>
+
+          <!-- Login Tab -->
+          <div id="tabLogin" class="tab-content">
+            <label for="email">Email Address</label>
+            <input id="email" type="email" placeholder="e.g. employee@example.com" value="employee@example.com" />
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Password (min 8 chars)" value="Employee@123" />
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary" onclick="login()">Login</button>
+              <button type="button" class="btn btn-secondary" onclick="googleLogin()">Continue with Google</button>
+            </div>
+          </div>
+
+          <!-- Register Tab -->
+          <div id="tabRegister" class="tab-content" style="display:none;">
+            <label for="regName">Full Name</label>
+            <input id="regName" placeholder="Full Name" value="Jane Doe" />
+            <label for="regEmail">Email Address</label>
+            <input id="regEmail" type="email" placeholder="Email" value="jane@example.com" />
+            <label for="regPassword">Password</label>
+            <input id="regPassword" type="password" placeholder="Password (min 8 chars)" value="Jane@12345" />
+            <label for="regRole">Role</label>
+            <select id="regRole" class="custom-select">
+              <option value="Employee">Employee (Profile only)</option>
+              <option value="Manager">Manager (Profile + Payroll)</option>
+              <option value="SuperAdmin">SuperAdmin (Full Permissions)</option>
+            </select>
+            <label for="regTenant">Tenant ID</label>
+            <input id="regTenant" placeholder="Tenant ID" value="tenant-demo" />
+            <button type="button" class="btn btn-primary" onclick="registerUser()">Register Account</button>
+          </div>
+
+          <pre id="output" class="console-box">// Auth response output</pre>
+        </section>
+      </div>
+
+      <!-- Protected APIs -->
+      <div class="col">
+        <section class="card">
+          <div class="card-header">
+            <h2>Protected API Endpoints</h2>
+            <span class="card-hint">Tests RBAC and token validation</span>
+          </div>
+
+          <div class="api-actions">
+            <div class="action-item">
+              <button type="button" class="btn btn-api" onclick="profile()">
+                <span class="method get">GET</span> /employee/profile
+              </button>
+              <small>Accessible by: Employee, Manager, SuperAdmin</small>
+            </div>
+
+            <div class="action-item">
+              <button type="button" class="btn btn-api" onclick="payroll()">
+                <span class="method post">POST</span> /payroll/approve
+              </button>
+              <small>Accessible by: Manager, SuperAdmin (403 for Employee)</small>
+            </div>
+
+            <div class="action-item">
+              <button type="button" class="btn btn-api" onclick="listTenantUsers()">
+                <span class="method get">GET</span> /users
+              </button>
+              <small>Accessible by: SuperAdmin (Lists users in current tenant)</small>
+            </div>
+
+            <div class="action-item delete-box">
+              <div class="input-with-button">
+                <input id="deleteUserId" placeholder="User ObjectId to delete" />
+                <button type="button" class="btn btn-danger" onclick="deleteUser()">
+                  <span class="method del">DEL</span> /users/:id
+                </button>
+              </div>
+              <small>Accessible by: SuperAdmin (Enforces tenant isolation)</small>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="btn-group">
+              <button type="button" class="btn btn-warning" onclick="refresh()">Rotate Refresh Token</button>
+              <button type="button" class="btn btn-outline-danger" onclick="logout()">Logout</button>
+            </div>
+          </div>
+
+          <pre id="apiOutput" class="console-box">// API call result output</pre>
+        </section>
+      </div>
+    </div>
+
+    <!-- Token Inspector & Viva Test Matrix -->
+    <section class="card">
+      <div class="card-header">
+        <h2>Viva Test Matrix & Checklist</h2>
+      </div>
+      <div class="matrix-grid">
+        <div class="matrix-item">
+          <strong>1. Employee Login</strong>
+          <p>Login as Employee &rarr; Check profile works &rarr; Try payroll approve (must return 403 Forbidden).</p>
+        </div>
+        <div class="matrix-item">
+          <strong>2. Manager Login</strong>
+          <p>Login as Manager &rarr; Check profile works &rarr; Call payroll approve (returns 200 OK).</p>
+        </div>
+        <div class="matrix-item">
+          <strong>3. SuperAdmin Deletion</strong>
+          <p>SuperAdmin can delete tenant users &rarr; Cross-tenant user deletion is rejected &rarr; Self-deletion is blocked.</p>
+        </div>
+        <div class="matrix-item">
+          <strong>4. Token Rotation & Revocation</strong>
+          <p>Refresh rotation revokes old token in DB &rarr; issues a fresh pair &rarr; Logout revokes server-side.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
