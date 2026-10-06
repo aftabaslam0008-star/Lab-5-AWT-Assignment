@@ -186,3 +186,25 @@ enterprise-security-gateway/
 │   └── Enterprise-Security-Gateway.postman_collection.json
 └── README.md
 ```
+
+<img width="854" height="644" alt="1" src="https://github.com/user-attachments/assets/099570c9-240a-42a2-8372-cea4d9613622" />
+
+
+<img width="732" height="355" alt="2" src="https://github.com/user-attachments/assets/f49dcdc3-d1e0-4be2-8cf0-b2b0ba1c6104" />
+
+
+<img width="790" height="363" alt="3" src="https://github.com/user-attachments/assets/335bdf15-eea0-4f06-a6cd-2920fad2c85c" />
+
+
+<img width="411" height="570" alt="4" src="https://github.com/user-attachments/assets/9dc34816-f3b1-4878-92e4-59838b5df16c" />
+
+
+<img width="1264" height="691" alt="5" src="https://github.com/user-attachments/assets/8982db42-a0f6-47a2-a57d-c776affaf98f" />
+
+
+<img width="420" height="638" alt="6" src="https://github.com/user-attachments/assets/0c3ebac2-f1fd-467a-adf1-309052482567" />
+
+
+
+
+
